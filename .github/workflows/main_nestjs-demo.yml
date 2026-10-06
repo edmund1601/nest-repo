@@ -52,3 +52,10 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_970CF38ECF5F459187A80D96A9D0AF9F }}
+      - name: Deploy to Web App New
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'nestjs-new'
+          slot-name: 'Production'
+          package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_NEW }}
