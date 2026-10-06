@@ -13,19 +13,31 @@ import { AppService } from './app.service.js';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('AZURE_SQL_SERVER'),
-        port: 5432,
-        database: configService.get<string>('AZURE_SQL_DATABASE'),
-        username: configService.get<string>('AZURE_SQL_USER'),
-        password: configService.get<string>('AZURE_SQL_PASSWORD'),
-        ssl: {
-          rejectUnauthorized: false,
-        },
-        synchronize: false,
-        autoLoadEntities: true,
-      }),
+      useFactory: (configService: ConfigService) => {
+        const databaseUrl = configService.get<string>('DATABASE_URL');
+        if (databaseUrl) {
+          // Let TypeORM/pg parse the full URL. Provide ssl via `extra` when needed.
+          return {
+            type: 'postgres',
+            url: databaseUrl,
+            extra: { ssl: { rejectUnauthorized: false } },
+            synchronize: false,
+            autoLoadEntities: true,
+          } as any;
+        }
+
+        return {
+          type: 'postgres',
+          host: configService.get<string>('AZURE_SQL_SERVER'),
+          port: configService.get<number>('AZURE_SQL_PORT') ?? 5432,
+          database: configService.get<string>('AZURE_SQL_DATABASE'),
+          username: configService.get<string>('AZURE_SQL_USER'),
+          password: configService.get<string>('AZURE_SQL_PASSWORD'),
+          ssl: { rejectUnauthorized: false },
+          synchronize: false,
+          autoLoadEntities: true,
+        };
+      },
     }),
   ],
   controllers: [AppController],
