@@ -9,4 +9,14 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Get('db-check')
+  async getDbStatus() {
+    return this.appService.getDbStatus();
+  }
+
+  @Get('users')
+  async getUsers() {
+    return this.appService.getUsers();
+  }
 }
